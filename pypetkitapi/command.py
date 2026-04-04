@@ -56,6 +56,9 @@ class FeederCommand(StrEnum):
     REMOVE_DAILY_FEED = "remove_daily_feed"
     RESTORE_DAILY_FEED = "restore_daily_feed"
     SAVE_FEED = "save_feed"
+    SUSPEND_FEED = "suspend_feed"
+    RESTORE_FEED = "restore_feed"
+    SAVE_REPEATS = "save_repeats"
     PLAY_SOUND = "play_sound"
 
 
@@ -168,6 +171,27 @@ def get_endpoint_reset_desiccant(device):
     return PetkitEndpoint.DESICCANT_RESET_NEW  # New endpoint camelcase
 
 
+def get_endpoint_suspend_feed(device):
+    """Get the suspend feed endpoint for the device."""
+    if device.device_nfo.device_type in [FEEDER_MINI, FEEDER]:
+        return PetkitEndpoint.SUSPEND_FEED_OLD
+    return PetkitEndpoint.SUSPEND_FEED_NEW
+
+
+def get_endpoint_restore_feed(device):
+    """Get the restore feed endpoint for the device."""
+    if device.device_nfo.device_type in [FEEDER_MINI, FEEDER]:
+        return PetkitEndpoint.RESTORE_FEED_OLD
+    return PetkitEndpoint.RESTORE_FEED_NEW
+
+
+def get_endpoint_save_repeats(device):
+    """Get the save repeats endpoint for the device."""
+    if device.device_nfo.device_type in [FEEDER_MINI, FEEDER]:
+        return PetkitEndpoint.SAVE_REPEATS_OLD
+    return PetkitEndpoint.SAVE_REPEATS_NEW
+
+
 def get_endpoint_update_setting(device):
     """Get the endpoint for the device"""
     if device.device_nfo.device_type in [FEEDER_MINI, K3]:
@@ -274,6 +298,28 @@ ACTIONS_MAP = {
         params=lambda device, feed_daily_list: {
             "deviceId": device.id,
             "feedDailyList": json.dumps(feed_daily_list),
+        },
+        supported_device=DEVICES_FEEDER,
+    ),
+    FeederCommand.SUSPEND_FEED: CmdData(
+        endpoint=get_endpoint_suspend_feed,
+        params=lambda device: {
+            "deviceId": device.id,
+        },
+        supported_device=DEVICES_FEEDER,
+    ),
+    FeederCommand.RESTORE_FEED: CmdData(
+        endpoint=get_endpoint_restore_feed,
+        params=lambda device: {
+            "deviceId": device.id,
+        },
+        supported_device=DEVICES_FEEDER,
+    ),
+    FeederCommand.SAVE_REPEATS: CmdData(
+        endpoint=get_endpoint_save_repeats,
+        params=lambda device, setting: {
+            "deviceId": device.id,
+            **setting,
         },
         supported_device=DEVICES_FEEDER,
     ),
