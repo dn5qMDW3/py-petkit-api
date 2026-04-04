@@ -65,6 +65,24 @@ class FeedItem(BaseModel):
     pet_amount: list | None = Field(None, alias="petAmount")
     time: int | None = None
 
+    def to_api_dict(self) -> dict:
+        """Serialize to camelCase dict for API calls."""
+        result: dict = {}
+        if self.time is not None:
+            result["time"] = self.time
+            result["id"] = str(self.id) if self.id is not None else str(self.time)
+        if self.amount is not None:
+            result["amount"] = self.amount
+        if self.amount1 is not None:
+            result["amount1"] = self.amount1
+        if self.amount2 is not None:
+            result["amount2"] = self.amount2
+        if self.name is not None:
+            result["name"] = self.name
+        if self.pet_amount is not None:
+            result["petAmount"] = self.pet_amount
+        return result
+
 
 class FeedDailyList(BaseModel):
     """Dataclass for feed daily list data."""
@@ -77,6 +95,24 @@ class FeedDailyList(BaseModel):
     total_amount1: int | None = Field(None, alias="totalAmount1")
     total_amount2: int | None = Field(None, alias="totalAmount2")
 
+    def to_api_dict(self) -> dict:
+        """Serialize to camelCase dict for the SAVE_FEED API endpoint."""
+        items_list = []
+        if self.items:
+            items_list = [item.to_api_dict() for item in self.items]
+        result: dict = {
+            "items": items_list,
+            "repeats": self.repeats,
+            "suspended": self.suspended or 0,
+        }
+        if self.total_amount is not None:
+            result["totalAmount"] = self.total_amount
+        if self.total_amount1 is not None:
+            result["totalAmount1"] = self.total_amount1
+        if self.total_amount2 is not None:
+            result["totalAmount2"] = self.total_amount2
+        return result
+
 
 class MultiFeedItem(BaseModel):
     """Dataclass for multi feed item data."""
@@ -84,6 +120,21 @@ class MultiFeedItem(BaseModel):
     feed_daily_list: list[FeedDailyList] | None = Field(None, alias="feedDailyList")
     is_executed: int | None = Field(None, alias="isExecuted")
     user_id: str | None = Field(None, alias="userId")
+
+    def get_daily_list_for_day(self, day: int) -> FeedDailyList | None:
+        """Get the FeedDailyList for a specific day (1-7)."""
+        if not self.feed_daily_list:
+            return None
+        for daily in self.feed_daily_list:
+            if daily.repeats == day or str(daily.repeats) == str(day):
+                return daily
+        return None
+
+    def to_api_list(self) -> list[dict]:
+        """Serialize all daily lists to API format."""
+        if not self.feed_daily_list:
+            return []
+        return [daily.to_api_dict() for daily in self.feed_daily_list]
 
 
 class CameraMultiNew(BaseModel):

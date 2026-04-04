@@ -49,7 +49,13 @@ from .exceptions import (
     PetkitTimeoutError,
     PypetkitError,
 )
-from .feeder_container import Feeder, RecordsItems
+from .feeder_container import (
+    Feeder,
+    FeedDailyList,
+    FeedItem,
+    MultiFeedItem,
+    RecordsItems,
+)
 from .litter_container import (
     Litter,
     LitterRecord,
@@ -94,6 +100,8 @@ __all__ = [
     "DownloadDecryptMedia",
     "Feeder",
     "FeederCommand",
+    "FeedDailyList",
+    "FeedItem",
     "FountainCommand",
     "IotInfo",
     "LBCommand",
@@ -105,6 +113,7 @@ __all__ = [
     "MediaFile",
     "MediaManager",
     "MediaType",
+    "MultiFeedItem",
     "NewIotInfo",
     "PackageInfoResult",
     "PackageListResult",
